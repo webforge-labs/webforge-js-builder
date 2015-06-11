@@ -1,0 +1,29 @@
+{
+  "name": "webforge-js-builder",
+  "version": "1.0.0",
+  "description": "Build your web-project with gulp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:webforge-labs/webforge-js-builder.git"
+  },
+  "author": "Philipp Scheit <p.scheit@ps-webforge.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/webforge-labs/webforge-js-builder/issues"
+  },
+  "homepage": "https://github.com/webforge-labs/webforge-js-builder",
+  "dependencies": {
+    "gulp-concat": "^2.5.2",
+    "gulp-dest": "^0.2.2",
+    "gulp-less": "^3.0.3",
+    "gulp-rename": "^1.2.2",
+    "gulp-subtask": "^0.3.1",
+    "gulp-wrap-amd": "^0.5.0",
+    "merge-stream": "^0.1.7",
+    "rimraf": "^2.4.0"
+  }
+}

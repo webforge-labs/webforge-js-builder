@@ -1,5 +1,4 @@
 var wrap = require('gulp-wrap-amd');
-var addsrc = require('gulp-add-src');
 var dest = require('gulp-dest');
 var rename = require('gulp-rename');
 
@@ -40,4 +39,9 @@ module.exports.knockoutMapping = function(builder) {
   return builder.add('js', 'knockout-mapping')
     .src('node_modules/knockout-mapping/dist/knockout.mapping.js')
     .pipe(rename, 'knockout-mapping.js');
+}
+
+module.exports['font-awesome'] = function(builder) {
+  return builder.add('fonts', 'font-awesome')
+    .src(['node_modules/font-awesome/fonts/**/*']);
 }
