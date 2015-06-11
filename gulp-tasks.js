@@ -28,7 +28,7 @@ module.exports['requirejs-config'] = function(gulp, builder, taskConfig) {
 module.exports.javascript = function(gulp, builder, taskConfig) {
   gulp.task('javascript', ['clean', 'requirejs-config'], function() {
     return builder.run('js')
-      .pipe(gulp.dest('www/cms/assets/js'));
+      .pipe(gulp.dest(builder.config.dest+'/js'));
   });
 };
 
@@ -41,12 +41,12 @@ module.exports.less = function(gulp, builder, taskConfig) {
   });
 
   gulp.task('less', ['clean'], function () {
-    return gulp.src(['src/less/cms.less'])
+    return gulp.src(taskConfig.src)
       .pipe(less({
          paths: includePaths,
          compress: !builder.config.dev
       }))
-      .pipe(gulp.dest('www/cms/assets/css'));
+      .pipe(gulp.dest(builder.config.dest+'/css'));
   });
 
 };

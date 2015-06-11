@@ -34,6 +34,7 @@ gulp.task('javascript', function() {
 
 - use the [gulp-subtask - Syntax](https://www.npmjs.com/package/gulp-subtask/) after .js() or .task()
 - use the normal gulp syntax after builder.run()
+- be aware that gulp will NOT show errors if some node modules haven't been found. Be sure install the node_modules you need (e.g. requirejs for the `requirejs-config`-gulp-task)
 
 ## why should I use something so complicated?
 
@@ -41,11 +42,15 @@ Have you ever had a project that needs to be build with more than 5 dependencies
 
 Look at the `gulp.dest` call. It's only done once so that your dependency build script does not need to worry about the build target. Your build is still in charge of all file locations and tasks!
 
-## usage
+## installation
 
 ```
 npm install --save-dev webforge-js-builder
+npm install --save-dev gulp
 ```
+
+## usage
+
 
 ### create the builder
 
@@ -56,6 +61,36 @@ var builder = new WebforgeBuilder(gulp, { root: __dirname, dest: "www/cms/assets
 ```
 
 The passed param `dest` will be referenced in this documentation as `{{dest}}`. Pass root if you want to use relative paths in taskConfigs or other paths given to the builder.
+
+## install a node module
+
+To install for example jquery from node_module do:
+
+```
+npm install --save jquery
+```
+
+add to your gulpfile.js:
+
+```
+builder
+  .registerTask('javascript')
+  .addConfigured('js', 'jquery')
+```
+
+run `gulp javascript`
+if `{{dest}}` is defined as `www/assets` then the file: `www/assets/js/jquery.js` should be created from the builder  
+Set your requirejs baseUrl to `/assets/js` if `www` is the document-root from your webserver and you should be able to load jquery from requirejs.
+
+```js
+var require = {
+  baseUrl: '/assets/js'
+};
+
+define('main', ['jquery', function($) {
+  console.log($('body'));
+});
+```
 
 ### api
 
