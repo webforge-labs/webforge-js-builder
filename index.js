@@ -59,6 +59,7 @@ module.exports = function(gulp, config) {
   };
 
   that.dest = require('gulp-dest');
+  that.rename = require('gulp-rename');
 
   this.addConfigured = function(lane, name) {
     if (!that.configuredTasks[name]) {
