@@ -61,12 +61,12 @@ module.exports = function(gulp, config) {
   that.dest = require('gulp-dest');
   that.rename = require('gulp-rename');
 
-  this.addConfigured = function(lane, name) {
+  this.addConfigured = function(lane, name, config) {
     if (!that.configuredTasks[name]) {
       throw new Error('The builder has no configuration for: '+name);
     }
 
-    that.configuredTasks[name](that);
+    that.configuredTasks[name](that, config || {});
     return that;
   };
 

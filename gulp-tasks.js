@@ -15,6 +15,13 @@ module.exports.fonts = function(gulp, builder) {
   });
 };
 
+module.exports.css = function(gulp, builder, taskConfig) {
+  gulp.task('css', ['clean'], function() {
+    return builder.run('css')
+      .pipe(gulp.dest(builder.config.dest+'/css'));
+  });
+};
+
 module.exports['requirejs-config'] = function(gulp, builder, taskConfig) {
   var concat = require('gulp-concat');
 
