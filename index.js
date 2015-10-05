@@ -17,6 +17,10 @@ var initConfig = function(config) {
   if (!config.hasOwnProperty('dev')) {
     config.dev = true;
   }
+
+  if (!config.hasOwnProperty('tmp')) {
+    config.tmp = 'files/cache/webforge-js-builder';
+  }
   
   return config;
 };

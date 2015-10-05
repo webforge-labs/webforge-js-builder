@@ -25,7 +25,7 @@ module.exports.css = function(gulp, builder, taskConfig) {
 module.exports['requirejs-config'] = function(gulp, builder, taskConfig) {
   var concat = require('gulp-concat');
 
-  gulp.task('requirejs-config', ['clean'], function() {
+  gulp.task('requirejs-config', ['clean', 'requirejs'], function() {
     return gulp.src([taskConfig.file, 'node_modules/requirejs/require.js'])
       .pipe(concat('load-require.js'))
       .pipe(gulp.dest(builder.config.dest+'/js'))
@@ -33,10 +33,93 @@ module.exports['requirejs-config'] = function(gulp, builder, taskConfig) {
 };
 
 module.exports.javascript = function(gulp, builder, taskConfig) {
-  gulp.task('javascript', ['clean', 'requirejs-config'], function() {
-    return builder.run('js')
-      .pipe(gulp.dest(builder.config.dest+'/js'));
-  });
+  if (taskConfig.combine) {
+    /*
+    var concat = require('gulp-concat');
+    var amdOptimize = require('gulp-amd-optimizer');
+    var requireConfig = taskConfig.requirejs;
+
+
+    gulp.task('javascript', ['clean', 'requirejs-config'], function() {
+      return builder.run('js')
+        .pipe(amdOptimize(requireConfig, { umd: true }))
+        .pipe(concat(requireConfig.modules[0].name+'.js'))
+        .pipe(gulp.dest(builder.config.dest+'/js'));
+    });
+    */
+
+    var requireConfig = taskConfig.requirejs;
+
+    requireConfig.appDir = builder.config.tmp+"/javascript"; // optimize this
+    requireConfig.dir = builder.config.dest+'/js'; // into this
+
+    if (!requireConfig.hasOwnProperty('baseUrl')) {
+      requireConfig.baseUrl = './'; // everything is rooted in appDir (thats our convention)
+    }
+
+    requireConfig.keepBuildDir = false;  // start with empty dir
+
+    if (!requireConfig.hasOwnProperty('removeCombined')) {
+      // we can remove the optimized files, when we load (from html) always the module "main". Because this will contain all others. 
+      //If you have other entry-points in html you have to add this entry point to modules!
+      requireConfig.removeCombined = true;
+    }
+
+    if (!requireConfig.hasOwnProperty('findNestedDependencies')) {
+      requireConfig.findNestedDependencies = true;
+    }
+
+    if (!requireConfig.hasOwnProperty('optimizeCss')) {
+      requireConfig.optimizeCss = false;
+    }
+
+    requireConfig.optimize = "uglify2";
+    requireConfig.uglify2 =  {
+      output: {
+        beautify: false
+      },
+      compress: {
+        sequences: false
+      },
+      warnings: false,
+      mangle: true
+    };
+      
+    requireConfig.skipDirOptimize =  true;
+    requireConfig.optimizeCss = "none";
+
+    // pipe all files to www/assets/js directory and write them
+    // because js files come from whole different locations (like node_modules, lib/, etc...)
+    gulp.task('javascript-files', ['clean'], function(done) {
+      return builder.run('js')
+        .pipe(gulp.dest(requireConfig.appDir));
+    });
+
+    gulp.task('javascript', ['requirejs-config'], function() {
+      // requirejs-config calls requirejs (so that the config is not removed from r.js optimizer)
+    });
+
+    // get those (hopfully written) files and optimize them
+    gulp.task('requirejs', ['javascript-files'], function(done) {
+      var requirejs = require('requirejs');
+      requirejs.optimize(requireConfig, function (buildResponse) {
+        done();
+      }, function(err) {
+        done(err);
+      });
+    });
+
+  } else {
+    gulp.task('requirejs', function() {
+      // nothing todo if combine is not activated
+      // but requirejs-config requires this task so we have to provide it!
+    });
+
+    gulp.task('javascript', ['clean', 'requirejs-config'], function() {
+      return builder.run('js')
+        .pipe(gulp.dest(builder.config.dest+'/js'));
+    });
+  }
 };
 
 module.exports.less = function(gulp, builder, taskConfig) {
