@@ -111,3 +111,29 @@ builder.add('js', 'cms')
 
 will copy/lint/minify all files in `src/js/cms` which end on `.js` and write them into the directory: `{{dest}}/js/cms`. Notice that `builder.dest` refers to a relative path in the `{{dest}}`-directory.  
 Notice the lazypipe syntax.
+
+## Specific Tasks and Configurations
+
+### requirejs
+
+I dont see how the latest gulp-amd-optimize plugins work well with my previous (advanced) requirejs setup. So the webforge-js-builder does use a native gulp task, that operates on written files. Uglify is enabled by default.
+
+The requirejs task is hooked into the javascript lane if you configure and enable it:
+```js
+  .registerTask('javascript', {
+    'combine': true,
+    'requirejs': {
+      
+      mainConfigFile: 'src/js/config.js', // adds some paths here. But nocie: baseUrl will be overriden anyway through this config
+
+      modules: [
+        {
+          name: "main"
+        },
+      ],
+    }
+  })
+``` 
+make sure that `combine` is set to true and you provide at least one module. Notice that the list of modules should match your entries from HTML that do require(['modulename']). You need to list every `modulename` here because if you miss a layer, the dependencies of the modules might be minified and cannot be found anymore.
+
+Because the javascript lane can include files from everywhere, the whole javascript-lane-files have to be written to a temporary directory, which is then optimized and uglified by the r.js optimizier. So be carfeul if you write files in to the javascript-lane destination - they might be killed bei r.js and resist only in the tmp directy (which is `files/cache/webforge-js-builder/javascript` by defaul).
