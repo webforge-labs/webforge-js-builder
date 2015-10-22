@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/webforge-labs/webforge-js-builder",
   "dependencies": {
+    "gulp-add-src": "^0.2.0",
     "gulp-concat": "^2.5.2",
     "gulp-dest": "^0.2.2",
+    "gulp-hogan-compile": "^0.4.1",
     "gulp-less": "^3.0.3",
     "gulp-rename": "^1.2.2",
     "gulp-subtask": "^0.3.1",

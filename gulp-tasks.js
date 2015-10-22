@@ -33,7 +33,7 @@ module.exports['requirejs-config'] = function(gulp, builder, taskConfig) {
 };
 
 module.exports.javascript = function(gulp, builder, taskConfig) {
-  if (taskConfig.combine) {
+  if (taskConfig && taskConfig.combine) {
     /*
     var concat = require('gulp-concat');
     var amdOptimize = require('gulp-amd-optimizer');
@@ -139,4 +139,23 @@ module.exports.less = function(gulp, builder, taskConfig) {
       .pipe(gulp.dest(builder.config.dest+'/css'));
   });
 
+};
+
+module.exports.templates = function(gulp, builder, taskConfig) {
+  var addsrc = require('gulp-add-src');
+  var hogan = require('gulp-hogan-compile');
+
+  gulp.task('templates', ['clean'], function() {
+    var path = require('path');
+    return gulp.src(taskConfig.path+'/**/*.mustache' || 'Resources/tpl/**/*.mustache')
+      .pipe(addsrc('node_modules/webforge-js-components/Resources/tpl/**'))
+      .pipe(
+        hogan('templates-compiled.js', {
+          templateName: function(file) {
+            return file.relative.replace(/\\/g, '/').slice(0, -".mustache".length);
+          },
+        })
+      )
+      .pipe(gulp.dest(builder.config.dest+'/js'));
+  });
 };
