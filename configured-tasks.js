@@ -72,13 +72,30 @@ module.exports.hogan = function(builder, config) {
 };
 
 module.exports.lodash = function(builder, config) {
-  return builder.add('js', 'lodash')
-    .src('node_modules/lodash/dist/lodash.compat.js')
-    .pipe(rename, 'lodash.js');
+  if (config && config.shimney) {
+    return builder.add('js', 'lodash')
+      .src('node_modules/shimney-lodash/main.js')
+      .pipe(rename, 'lodash.js');
+
+  } else {
+    return builder.add('js', 'lodash')
+      .src('node_modules/lodash/dist/lodash.compat.js')
+      .pipe(rename, 'lodash.js');
+  }
 };
 
 module.exports.json = function(builder, config) {
   return builder.add('js', 'json')
     .src('node_modules/shimney-json/main.js')
     .pipe(rename, 'JSON.js');
+};
+
+module.exports.superagent = function(builder, config) {
+  var execSync = require('child_process').execSync;
+  var modulePath = 'node_modules/superagent';
+
+  execSync('browserify --standalone superagent --outfile superagent.js .', {'cwd': modulePath});
+
+  return builder.add('js', 'json')
+    .src(modulePath+'/superagent.js')
 };
