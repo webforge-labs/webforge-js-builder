@@ -91,11 +91,19 @@ module.exports.json = function(builder, config) {
 };
 
 module.exports.superagent = function(builder, config) {
-  var execSync = require('child_process').execSync;
-  var modulePath = 'node_modules/superagent';
+  if (config && config.shimney) {
+    return builder.add('js', 'superagent')
+      .src('node_modules/shimney-superagent/main.js')
+      .pipe(rename, 'superagent.js');
 
-  execSync('browserify --standalone superagent --outfile superagent.js .', {'cwd': modulePath});
+  } else {
 
-  return builder.add('js', 'json')
-    .src(modulePath+'/superagent.js')
+    var execSync = require('child_process').execSync;
+    var modulePath = 'node_modules/superagent';
+
+    execSync('browserify --standalone superagent --outfile superagent.js .', {'cwd': modulePath});
+
+    return builder.add('js', 'superagent')
+      .src(modulePath+'/superagent.js')
+  }
 };
