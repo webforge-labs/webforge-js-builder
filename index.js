@@ -37,7 +37,7 @@ var specifySubTask = function(spec) {
   return spec;
 };
 
-module.exports = function(gulp, config) {
+module.exports = function(gulp, config, rootRequire) {
   var SubTask = require('gulp-subtask')(gulp);
 
   var that = this;
@@ -46,6 +46,7 @@ module.exports = function(gulp, config) {
   this.tasks = {};
   this.configuredTasks = require('./configured-tasks');
   this.gulpTasks = require('./gulp-tasks');
+  this.require = rootRequire;
 
   this.add = function(lane, spec) {
     spec = specifySubTask(spec);
@@ -91,8 +92,36 @@ module.exports = function(gulp, config) {
       throw new Error('The builder has no task named: '+name);
     }
 
-    that.gulpTasks[name](gulp, that, taskConfig);
+    that.gulpTasks[name](gulp, that, taskConfig || {});
 
     return that;
   };
+
+  this.resolveModule = function(name, alternative) {
+    var path = require('path');
+
+    if (name === 'font-awesome') {
+      // this does not have a "main" defined, so that it cannot be required()
+      // I have no workaround for this, yet (and no idea)
+      if (config.moduleSearchPaths) {
+        return config.moduleSearchPaths[0]+'/node_modules/font-awesome';
+      } else {
+        return 'node_modules/font-awesome';
+      }
+    }
+
+    try {
+      return path.dirname(that.require.resolve(name));
+    } catch (exc) {
+
+      if (alternative) {
+        try {
+          return path.dirname(that.require.resolve(alternative));
+        } catch (exc2) {
+        }
+      }
+
+      throw exc;
+    }
+  }
 };

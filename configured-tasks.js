@@ -5,8 +5,16 @@ var rename = require('gulp-rename');
 module.exports = {};
 
 module.exports.bootstrap = function(builder) {
+  var srcPath;
+
+  try {
+    srcPath = require('path').resolve(builder.resolveModule('bootstrap'), '..', '..', 'js');
+  } catch (exc) {
+    srcPath = builder.resolveModule('bootstrap-sass')+'/bootstrap';
+  }
+
   builder.add('js', 'bootstrap')
-    .src(['node_modules/bootstrap/js/*.js', '!**/popover.js'])
+    .src([srcPath+'/*.js', '!**/popover.js'])
     .pipe(wrap, {
       deps: ['jquery'],
       params: ['jQuery'],
@@ -15,7 +23,7 @@ module.exports.bootstrap = function(builder) {
     .pipe(dest, 'bootstrap');
   
   builder.add('js', 'bootstrap-popover')
-    .src('node_modules/bootstrap/js/popover.js')
+    .src(srcPath+'/popover.js')
     .pipe(wrap, {
       deps: ['jquery', './tooltip'],
       params: ['jQuery'],
@@ -24,42 +32,63 @@ module.exports.bootstrap = function(builder) {
     .pipe(dest, 'bootstrap');
 };
 
-module.exports.jquery = function(builder) {
-  return builder.add('js', 'jquery')
-    .src('node_modules/jquery/dist/jquery.js')
+module.exports.amplify = function(builder, config) {
+  if (config && config.shimney) {
+    builder.add('js', 'amplify')
+      .src(builder.resolveModule('shimney-amplify')+'/main.js')
+      .pipe(rename, 'amplify.js');
+
+  } else {
+
+    throw new Error('cannot build amplify from npm :(. use { shimney: true } for config');
+    /*
+    builder.add('js', 'amplify')
+      .src([builder.resolveModule('amplify')+'/lib/amplify/amplify.js'])
+      .pipe(wrap, {
+        deps: [],
+        params: [],
+        exports: 'amplify'
+      });
+    */
+   }
 };
 
-module.exports.knockout = function(builder) {
+module.exports.jquery = function(builder) {
+  return builder.add('js', 'jquery')
+    .src(builder.resolveModule('jquery')+'/jquery.js')
+};
+
+module.exports.knockout = function(builder, config) {
   return builder.add('js', 'knockout')
-    .src('node_modules/knockout/build/output/knockout-latest.js')
+    .src(builder.resolveModule('knockout')+'/knockout-latest'+(config.debug ? '.debug' : '' )+'.js')
     .pipe(rename, 'knockout.js');
 };
 
 module.exports.knockoutMapping = function(builder) {
   return builder.add('js', 'knockout-mapping')
-    .src('node_modules/knockout-mapping/dist/knockout.mapping.js')
+    .src(builder.resolveModule('knockout-mapping')+'/dist/knockout.mapping.js')
     .pipe(rename, 'knockout-mapping.js');
 };
 
 module.exports.moment = function(builder) {
   return builder.add('js', 'moment')
-    .src('node_modules/moment/moment.js')
+    .src(builder.resolveModule('moment')+'/moment.js')
 };
 
 module.exports['font-awesome'] = function(builder) {
   return builder.add('fonts', 'font-awesome')
-    .src(['node_modules/font-awesome/fonts/**/*']);
+    .src([builder.resolveModule('font-awesome')+'/fonts/**/*']);
 };
 
 module.exports.sammy = function(builder) {
   return builder.add('js', 'sammy')
-    .src('node_modules/shimney-sammy/main.js')
+    .src(builder.resolveModule('shimney-sammy')+'/main.js')
     .pipe(rename, 'sammy.js');
 };
 
 module.exports['cookie-monster'] = function(builder) {
   return builder.add('js', 'cookie-monster')
-    .src('node_modules/shimney-cookie-monster/main.js')
+    .src(builder.resolveModule('shimney-cookie-monster')+'/main.js')
     .pipe(rename, 'cookie-monster.js');
 };
 
@@ -67,43 +96,67 @@ module.exports.hogan = function(builder, config) {
   var version = config.version || '2.0.0';
 
   return builder.add('js', 'hogan')
-    .src('node_modules/hogan.js/web/builds/'+version+'/hogan-'+version+'.amd.js')
+    .src(builder.resolveModule('hogan.js')+'/web/builds/'+version+'/hogan-'+version+'.amd.js')
     .pipe(rename, 'hogan.js');
 };
 
 module.exports.lodash = function(builder, config) {
   if (config && config.shimney) {
     return builder.add('js', 'lodash')
-      .src('node_modules/shimney-lodash/main.js')
+      .src(builder.resolveModule('shimney-lodash')+'/main.js')
       .pipe(rename, 'lodash.js');
 
   } else {
     return builder.add('js', 'lodash')
-      .src('node_modules/lodash/dist/lodash.compat.js')
+      .src(builder.resolveModule('lodash')+'/dist/lodash.compat.js')
       .pipe(rename, 'lodash.js');
   }
 };
 
 module.exports.json = function(builder, config) {
   return builder.add('js', 'json')
-    .src('node_modules/shimney-json/main.js')
+    .src(builder.resolveModule('shimney-json')+'/main.js')
     .pipe(rename, 'JSON.js');
 };
 
 module.exports.superagent = function(builder, config) {
   if (config && config.shimney) {
     return builder.add('js', 'superagent')
-      .src('node_modules/shimney-superagent/main.js')
+      .src(builder.resolveModule('shimney-superagent')+'/main.js')
       .pipe(rename, 'superagent.js');
 
   } else {
 
     var execSync = require('child_process').execSync;
-    var modulePath = 'node_modules/superagent';
+    var modulePath = builder.resolveModule('superagent');
 
     execSync('browserify --standalone superagent --outfile superagent.js .', {'cwd': modulePath});
 
     return builder.add('js', 'superagent')
       .src(modulePath+'/superagent.js')
   }
+};
+
+module.exports['webforge-js-components'] = function(builder, config) {
+  var modulePath = builder.resolveModule('webforge-js-components');
+
+  builder.add('js', 'webforge-js-components')
+    .src(modulePath+'/src/js/Webforge/**/*.js')
+    .pipe(builder.dest, 'Webforge')
+
+  builder.add('js', 'webforge-js-components-modules')
+    .src(modulePath+'/src/js/default-modules/**/*.js')
+    .pipe(builder.dest, 'modules')
+};
+
+module.exports.accounting = function(builder, config) {
+  return builder.add('js', 'accounting')
+    .src(builder.resolveModule('accounting')+'/accounting.js')
+    //.pipe(rename, '.js');
+};
+
+module.exports['knockout-collection'] = function(builder, config) {
+  return builder.add('js', 'knockout-collection')
+    .src(builder.resolveModule('knockout-collection')+'/index.js')
+    .pipe(rename, 'knockout-collection.js');
 };

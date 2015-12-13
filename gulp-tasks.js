@@ -1,3 +1,7 @@
+var gulpif = require('gulp-if');
+var path = require('path');
+var concat = require('gulp-concat');
+
 module.exports = {};
 
 module.exports.clean = function(gulp, builder) {
@@ -18,15 +22,16 @@ module.exports.fonts = function(gulp, builder) {
 module.exports.css = function(gulp, builder, taskConfig) {
   gulp.task('css', ['clean'], function() {
     return builder.run('css')
+      .pipe(gulpif(taskConfig.concat, concat(taskConfig.target || 'app.css')))
       .pipe(gulp.dest(builder.config.dest+'/css'));
   });
 };
 
 module.exports['requirejs-config'] = function(gulp, builder, taskConfig) {
-  var concat = require('gulp-concat');
+  var modulePath = path.resolve(builder.resolveModule('requirejs'), '..');
 
   gulp.task('requirejs-config', ['clean', 'requirejs'], function() {
-    return gulp.src([taskConfig.file, 'node_modules/requirejs/require.js'])
+    return gulp.src([taskConfig.file, modulePath+'/require.js'])
       .pipe(concat('load-require.js'))
       .pipe(gulp.dest(builder.config.dest+'/js'))
   });
@@ -34,20 +39,6 @@ module.exports['requirejs-config'] = function(gulp, builder, taskConfig) {
 
 module.exports.javascript = function(gulp, builder, taskConfig) {
   if (taskConfig && taskConfig.combine) {
-    /*
-    var concat = require('gulp-concat');
-    var amdOptimize = require('gulp-amd-optimizer');
-    var requireConfig = taskConfig.requirejs;
-
-
-    gulp.task('javascript', ['clean', 'requirejs-config'], function() {
-      return builder.run('js')
-        .pipe(amdOptimize(requireConfig, { umd: true }))
-        .pipe(concat(requireConfig.modules[0].name+'.js'))
-        .pipe(gulp.dest(builder.config.dest+'/js'));
-    });
-    */
-
     var requireConfig = taskConfig.requirejs;
 
     requireConfig.appDir = builder.config.tmp+"/javascript"; // optimize this
@@ -101,12 +92,24 @@ module.exports.javascript = function(gulp, builder, taskConfig) {
 
     // get those (hopfully written) files and optimize them
     gulp.task('requirejs', ['javascript-files'], function(done) {
-      var requirejs = require('requirejs');
+      var requirejs = builder.require('requirejs');
+
       requirejs.optimize(requireConfig, function (buildResponse) {
         done();
       }, function(err) {
         done(err);
       });
+    });
+
+  } else if (taskConfig && taskConfig.concat) {
+    gulp.task('requirejs-config', function() {
+      // no requirejs-config when concat is not activated
+    });
+
+    gulp.task('javascript', ['clean', 'requirejs-config'], function() {
+      return builder.run('js')
+        .pipe(concat(taskConfig.target || 'app.js'))
+        .pipe(gulp.dest(builder.config.dest+'/js'));
     });
 
   } else {
