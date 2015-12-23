@@ -64,9 +64,9 @@ module.exports.knockout = function(builder, config) {
     .pipe(rename, 'knockout.js');
 };
 
-module.exports.knockoutMapping = function(builder) {
+module.exports['knockout-mapping'] = module.exports.knockoutMapping = function(builder) {
   return builder.add('js', 'knockout-mapping')
-    .src(builder.resolveModule('knockout-mapping')+'/dist/knockout.mapping.js')
+    .src(builder.resolveModule('knockout-mapping')+'/knockout.mapping.js')
     .pipe(rename, 'knockout-mapping.js');
 };
 
