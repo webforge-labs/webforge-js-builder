@@ -96,7 +96,7 @@ module.exports.hogan = function(builder, config) {
   var version = config.version || '2.0.0';
 
   return builder.add('js', 'hogan')
-    .src(builder.resolveModule('hogan.js')+'/web/builds/'+version+'/hogan-'+version+'.amd.js')
+    .src(builder.resolveModule('hogan.js')+'/../web/builds/'+version+'/hogan-'+version+'.amd.js')
     .pipe(rename, 'hogan.js');
 };
 
