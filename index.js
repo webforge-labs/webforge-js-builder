@@ -48,6 +48,10 @@ module.exports = function(gulp, config, rootRequire) {
   this.gulpTasks = require('./gulp-tasks');
   this.require = rootRequire;
 
+  if (!that.require) {
+    throw new Error('Please pass the require function from the gulpfile.js to the builder as third Argument');
+  }
+
   this.add = function(lane, spec) {
     spec = specifySubTask(spec);
 
