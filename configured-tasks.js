@@ -108,7 +108,7 @@ module.exports.lodash = function(builder, config) {
 
   } else {
     return builder.add('js', 'lodash')
-      .src(builder.resolveModule('lodash')+'/dist/lodash.compat.js')
+      .src(builder.resolveModule('lodash')+'/lodash.compat.js')
       .pipe(rename, 'lodash.js');
   }
 };
