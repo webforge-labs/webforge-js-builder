@@ -160,3 +160,16 @@ module.exports['knockout-collection'] = function(builder, config) {
     .src(builder.resolveModule('knockout-collection')+'/index.js')
     .pipe(rename, 'knockout-collection.js');
 };
+
+
+module.exports['requirejs-text'] = function(builder, config) {
+  return builder.add('js', 'requirejs-text')
+    .src(builder.resolveModule('requirejs-text')+'/text.js')
+    .pipe(rename, 'text.js');
+};
+
+module.exports['requirejs-json'] = function(builder, config) {
+  return builder.add('js', 'requirejs-json')
+    .src(builder.resolveModule('shimney-requirejs-json')+'/main.js')
+    .pipe(rename, 'json.js');
+};
