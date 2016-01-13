@@ -8,7 +8,9 @@ module.exports.clean = function(gulp, builder) {
   var rimraf = require('rimraf');
 
   gulp.task('clean', function (cb) {
-    rimraf(builder.config.dest, cb);
+    rimraf(builder.config.dest, function() {
+      rimraf(builder.config.tmp+"/javascript", cb);
+    });
   });
 };
 
