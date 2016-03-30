@@ -104,14 +104,11 @@ module.exports = function(gulp, config, rootRequire) {
   this.resolveModule = function(name, alternative) {
     var path = require('path');
 
+    // this does not have a "main" defined, so that it cannot be required()
     if (name === 'font-awesome') {
-      // this does not have a "main" defined, so that it cannot be required()
-      // I have no workaround for this, yet (and no idea)
-      if (config.moduleSearchPaths) {
-        return config.moduleSearchPaths[0]+'/node_modules/font-awesome';
-      } else {
-        return 'node_modules/font-awesome';
-      }
+      var exec = require('child_process').execSync;
+      var lspath = exec('npm ls '+name+' --parseable', { cwd: that.config.root});
+      return lspath.toString().replace(/[\r\n]*$/g, '');
     }
 
     try {
