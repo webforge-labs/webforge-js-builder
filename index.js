@@ -127,7 +127,7 @@ module.exports = function(gulp, config, rootRequire) {
         var execSync = require('child_process').execSync;
         var lspath;
         try {
-          lspath = execSync('npm ls '+name+' --parseable', { cwd: that.config.root});
+          lspath = execSync('npm ls '+name+' --parseable', { cwd: that.config.root, stdio: ['pipe', 'pipe', 'ignore']});
         } catch (e) {
           if (e.status === 1) {
             lspath = e.stdout;
@@ -135,10 +135,13 @@ module.exports = function(gulp, config, rootRequire) {
             throw e;
           }
         }
+
+        lspath = lspath.toString();
+
         // take the first line
-        var match = lspath.toString().match(/^(.*?)([\r\n]+|$)/);
-        if (match === null) {
-          throw new Error('Could not parse ls output: '+lspath.toString());
+        var match = lspath.match(/^(.*?)([\r\n]+|$)/);
+        if (match === null || match[1] == "") {
+          throw new Error('Could not parse ls output: '+lspath);
         }
         
         return that.resolvedModules[name] = match[1];
