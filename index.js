@@ -113,28 +113,6 @@ module.exports = function(gulp, config, rootRequire) {
       return that.resolvedModules[alternative];
     }
 
-    // this does not have a "main" defined, so that it cannot be required()
-    if (name === 'font-awesome') {
-      var execSync = require('child_process').execSync;
-      var lspath;
-      try {
-        lspath = execSync('npm ls '+name+' --parseable', { cwd: that.config.root});
-      } catch (e) {
-        if (e.status === 1) {
-          lspath = e.stdout;
-        } else {
-          throw e;
-        }
-      }
-      // take the first line
-      var match = lspath.toString().match(/^(.*?)([\r\n]+|$)/);
-      if (match === null) {
-        throw new Error('Could not parse ls output: '+lspath.toString());
-      }
-      
-      return that.resolvedModules[name] = match[1];
-    }
-
     try {
       return that.resolvedModules[name] = path.dirname(that.require.resolve(name));
     } catch (exc) {
@@ -144,6 +122,26 @@ module.exports = function(gulp, config, rootRequire) {
           return that.resolvedModules[alternative] = path.dirname(that.require.resolve(alternative));
         } catch (exc2) {
         }
+      } else {
+        // this does not have a "main" defined, so that it cannot be required()
+        var execSync = require('child_process').execSync;
+        var lspath;
+        try {
+          lspath = execSync('npm ls '+name+' --parseable', { cwd: that.config.root});
+        } catch (e) {
+          if (e.status === 1) {
+            lspath = e.stdout;
+          } else {
+            throw e;
+          }
+        }
+        // take the first line
+        var match = lspath.toString().match(/^(.*?)([\r\n]+|$)/);
+        if (match === null) {
+          throw new Error('Could not parse ls output: '+lspath.toString());
+        }
+        
+        return that.resolvedModules[name] = match[1];
       }
 
       throw exc;
