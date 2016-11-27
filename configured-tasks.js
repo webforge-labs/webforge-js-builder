@@ -173,3 +173,8 @@ module.exports['requirejs-json'] = function(builder, config) {
     .src(builder.resolveModule('shimney-requirejs-json')+'/main.js')
     .pipe(rename, 'json.js');
 };
+
+module.exports['bootstrap-select'] = function(builder, config) {
+  builder.add('js', 'bootstrap-select')
+    .src(builder.resolveModule('bootstrap-select')+'/bootstrap-select.js');
+};
