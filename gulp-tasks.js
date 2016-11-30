@@ -67,19 +67,22 @@ module.exports.javascript = function(gulp, builder, taskConfig) {
     }
 
     requireConfig.optimize = "uglify2";
-    requireConfig.uglify2 =  {
-      output: {
-        beautify: false
-      },
-      compress: {
-        sequences: false
-      },
-      warnings: false,
-      mangle: true
-    };
+    if (!requireConfig.hasOwnProperty('uglify2')) {
+      requireConfig.uglify2 =  {
+        output: {
+          beautify: false
+        },
+        compress: {
+          sequences: false
+        },
+        warnings: false,
+        mangle: true
+      };
+    }
       
-    requireConfig.skipDirOptimize =  true;
-    requireConfig.optimizeCss = "none";
+    if (!requireConfig.hasOwnProperty('skipDirOptimize')) {
+      requireConfig.skipDirOptimize =  false;
+    }
 
     // pipe all files to www/assets/js directory and write them
     // because js files come from whole different locations (like node_modules, lib/, etc...)
