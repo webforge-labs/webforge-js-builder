@@ -1,6 +1,7 @@
 var gulpif = require('gulp-if');
 var path = require('path');
 var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
 
 module.exports = {};
 
@@ -35,6 +36,7 @@ module.exports['requirejs-config'] = function(gulp, builder, taskConfig) {
   gulp.task('requirejs-config', ['clean', 'requirejs'], function() {
     return gulp.src([taskConfig.file, modulePath+'/require.js'])
       .pipe(concat('load-require.js'))
+      .pipe(uglify())
       .pipe(gulp.dest(builder.config.dest+'/js'))
   });
 };
