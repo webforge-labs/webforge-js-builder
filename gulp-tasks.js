@@ -68,6 +68,10 @@ module.exports.javascript = function(gulp, builder, taskConfig) {
       requireConfig.optimizeCss = false;
     }
 
+    if(!requireConfig.hasOwnProperty('preserveLicenseComments')) {
+      requireConfig.preserveLicenseComments = false;
+    }
+
     requireConfig.optimize = "uglify2";
     if (!requireConfig.hasOwnProperty('uglify2')) {
       requireConfig.uglify2 =  {
