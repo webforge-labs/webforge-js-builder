@@ -8,9 +8,9 @@ module.exports.bootstrap = function(builder) {
   var srcPath;
 
   try {
-    srcPath = require('path').resolve(builder.resolveModule('bootstrap'), '..', '..', 'js');
+    srcPath = require('path').dirname(require.resolve('bootstrap-sass'))+'/bootstrap';
   } catch (exc) {
-    srcPath = builder.resolveModule('bootstrap-sass')+'/bootstrap';
+    srcPath = require('path').resolve(builder.resolveModule('bootstrap'), '..', '..', 'js');
   }
 
   builder.add('js', 'bootstrap')
